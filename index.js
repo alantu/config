@@ -9,12 +9,24 @@ var path = require('path');
 module.exports = function(dir) {
   var config = global._config;
 
-  dir = dir || path.resolve(process.cwd(), 'config');
-
-  var base = require(path.resolve(dir, 'base'));
-
   if (config) {
     return config;
+  }
+
+  dir = dir || path.resolve(process.cwd(), 'config');
+
+  /**
+   * Base configuration
+   */
+
+  var base = {};
+
+  try {
+    base = require(path.resolve(dir, 'base'));
+  } catch(e) {}
+
+  if (!base.common) {
+    base.common = {};
   }
 
   /**
@@ -32,10 +44,9 @@ module.exports = function(dir) {
 
   try {
     custom = require(path.resolve(dir, env + '.json'));
-    base[env] = custom;
-  } catch(e) {
+  } catch(e) {}
 
-  }
+  base[env] = custom;
 
   /**
    * Expose globals
